@@ -1,0 +1,116 @@
+﻿@model BulkyBook.Models.RequestFeatures.PagedList<BulkyBook.Models.Product>
+@*@model ReflectionIT.Mvc.Paging.PagingList<BulkyBook.Models.Product>*@
+
+<form asp-action="Index" method="get">
+    <p>
+        Title: <input type="text" name="searchTerm" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
+<form asp-action="Index" method="get">
+    <select name="orderPrice" id="saveValue">
+        <option value="defaultOrderPrice">Best match</option>
+        <option value="priceDesc">Price Descending</option>
+        <option value="priceAsc">Price Ascending</option>
+    </select>
+
+
+</form>
+
+<a asp-action="Index" asp-route-searchTerm="action">Action</a>
+<br />
+<a asp-action="Index" asp-route-searchTerm="fiction">Fiction</a>
+@if (Model.Count() == 0)
+{
+    <div class="text-center">There are no products there.</div>
+}
+else
+{
+    <div class="row pb-3 backgroundWhite">
+        @foreach (var product in Model)
+        {
+
+            <div class="col-lg-3 col-md-6">
+                <div class="row p-2">
+                    <div class="col-12  p-1" style="border:1px solid #008cba; border-radius: 5px;">
+                        <div class="card" style="border:0px;">
+                            <img src="@product.ImageUrl" class="card-img-top rounded" />
+                            <div class="pl-1">
+                                <p class="card-title h5"><b style="color:#2c3e50">@product.Title</b></p>
+                                <p class="card-title text-primary">by <b>@product.Author</b></p>
+                            </div>
+                            <div style="padding-left:5px;">
+                                <p>List Price: <strike><b class="">$@product.ListPrice.ToString("0.00")</b></strike></p>
+                            </div>
+                            <div style="padding-left:5px;">
+                                <p style="color:maroon">As low as: <b class="">$@product.Price100.ToString("0.00")</b></p>
+                            </div>
+                        </div>
+                        <div>
+                            <a asp-action="Details" class="btn btn-primary form-control" asp-route-id="@product.Id">Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+
+
+    </div>
+}
+
+@{
+    var prevDisabled = !Model.MetaData.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.MetaData.HasNext ? "disabled" : "";
+}
+
+<div class="text-center">
+    <a asp-action="Index"
+       asp-route-pageNumber="@(Model.MetaData.CurrentPage - 1)"
+       asp-route-searchTerm="@ViewData["SearchTerm"]"
+       asp-route-orderPrice="@ViewData["OrderPrice"]"
+       class="btn btn-default @prevDisabled">
+        Previous
+    </a>
+    <a asp-action="Index"
+       asp-route-pageNumber="@(Model.MetaData.CurrentPage + 1)"
+       asp-route-searchTerm="@ViewData["SearchTerm"]"
+       asp-route-orderPrice="@ViewData["OrderPrice"]"
+       class="btn btn-default @nextDisabled">
+        Next
+    </a>
+</div>
+
+<script>
+    
+    //if (saveValue != null) {
+    //    document.querySelectorAll("select[name=orderPrice]").value(saveValue);
+    //}
+    
+    document.getElementById("saveValue").addEventListener("change", function () {
+        //this.value;
+        localStorage.setItem("saveValue", this.value);
+        this.form.submit();
+        //document.getElementById("saveValue").value = localStorage.getItem("saveValue");
+       
+        
+    })
+    if (localStorage.getItem("saveValue") == null) {
+        document.getElementById("saveValue").value = "defaultOrderPrice"
+    }
+    else {
+        document.getElementById("saveValue").value = localStorage.getItem("saveValue");
+    }
+
+    //$(document).ready(function () {
+    //    var saveValue = localStorage.getItem("saveValue");
+    //    if (genderValue != null) {
+    //        $("select[name=orderPrice]").val(saveValue);
+    //    }
+
+    //    $("select[name=orderPrice]").on("change", function () {
+    //        localStorage.setItem("saveValue", $(this).val());
+    //    });
+    //});
+</script>
